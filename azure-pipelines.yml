@@ -41,13 +41,18 @@ stages:
             buildType: 'current'
             artifactName: 'javalogin'
             itemPattern: 
-            targetPath: '$(Pipeline.Workspace)/$(artifactName)'
+            targetPath: '$(Pipeline.Workspace)/drop'
         - task: CopyFilesOverSSH@0
           inputs:
             sshEndpoint: 'javalogin'
-            sourceFolder: '$(Pipeline.Workspace)/$(artifactName)'
+            sourceFolder: '$(Pipeline.Workspace)/drop'
             contents: '$(warFileName)'
-            targetFolder: '%(deployFolder)'
+            targetFolder: '$(deployFolder)'
             readyTimeout: '20000'
+        - task: Bash@3
+          inputs:
+            targetType: 'inline'
+            script: 'sudo systemctl restart tomcat'
+        
         
         

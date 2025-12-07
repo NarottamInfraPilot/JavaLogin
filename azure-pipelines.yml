@@ -1,13 +1,30 @@
 trigger: 
   - main
 pool: mypool
-jobs:
-  - job:
-    steps:
-      - task: Bash@3
-        inputs:
-          targetType: 'inline'
-          script: |
-            sudo apt update
-            sudo apt install -y maven
-            mvn clean compile checkstyle:check
+
+variables:
+  appName: 'JavaLoginShowcase'
+  warFileName: 'JavaLoginShowcase.war'
+  artifactName: 'drop'
+  jdkVersion: '1.8'         # 1.8 / 11 / 17 jo chahiye
+  tomcatHome: '/opt/tomcat' # apne server ka TOMCAT_HOME yaha daalo
+  deployFolder: '/opt/tomcat/deploy'  # temp folder jaha WAR copy hoga
+
+stages:
+  - stage: 
+    displayName: build wali stage
+    jobs:
+      - job: 
+        displayName: build wali job
+        steps:
+        - task: Maven@4
+          inputs:
+            mavenPomFile: 'pom.xml'
+            publishJUnitResults: true
+            testResultsFiles: '**/surefire-reports/TEST-*.xml'
+            javaHomeOption: 'JDKVersion'
+            mavenVersionOption: 'Default'
+            mavenAuthenticateFeed: false
+            effectivePomSkip: false
+            sonarQubeRunAnalysis: false
+            checkStyleRunAnalysis: true

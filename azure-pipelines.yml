@@ -1,0 +1,13 @@
+trigger: 
+  - main
+pool: mypool
+jobs:
+  - job:
+    steps:
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            sudo apt update
+            sudo apt install -y maven
+            mvn clean compile checkstyle:check

@@ -8,7 +8,8 @@ variables:
   artifactName: 'javalogin'
   jdkVersion: '1.8'         # 1.8 / 11 / 17 jo chahiye
   tomcatHome: '/opt/tomcat' # apne server ka TOMCAT_HOME yaha daalo
-  deployFolder: '/opt/tomcat/webapps'  # temp folder jaha WAR copy hoga
+  deployFolder: '/home/azureuser/javalogin_deploy'
+  # temp folder jaha WAR copy hoga
 
 stages:
   - stage: 
@@ -49,12 +50,20 @@ stages:
             contents: '$(warFileName)'
             targetFolder: '$(deployFolder)'
             readyTimeout: '20000'
+        - task: CopyFilesOverSSH@0
+          inputs:
+            sshEndpoint: 'javalogin'
+            sourceFolder: '$(deployFolder)'
+            contents: 'JavaLoginShowcase-1.0.0.war'
+            targetFolder: '/opt/tomcat/webapps'
+            readyTimeout: '20000'
         - task: SSH@0
           inputs:
             sshEndpoint: 'javalogin'
             runOptions: 'commands'
             commands: 'sudo systemctl restart tomcat'
             readyTimeout: '20000'
+        
 
         
         

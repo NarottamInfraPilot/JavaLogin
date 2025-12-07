@@ -4,11 +4,11 @@ pool: mypool
 
 variables:
   appName: 'JavaLoginShowcase'
-  warFileName: 'JavaLoginShowcase.war'
+  warFileName: 'JavaLoginShowcase-1.0.0.war'
   artifactName: 'drop'
   jdkVersion: '1.8'         # 1.8 / 11 / 17 jo chahiye
   tomcatHome: '/opt/tomcat' # apne server ka TOMCAT_HOME yaha daalo
-  deployFolder: '/opt/tomcat/deploy'  # temp folder jaha WAR copy hoga
+  deployFolder: '/opt/tomcat/webapps'  # temp folder jaha WAR copy hoga
 
 stages:
   - stage: 
@@ -29,3 +29,17 @@ stages:
           inputs:
             targetPath: '$(Pipeline.Workspace)'
             publishLocation: 'pipeline'
+
+  - stage: deployStage
+    displayName: Deploy karna hai
+    jobs:
+      - job: deployJob
+        steps:
+        - task: CopyFilesOverSSH@0
+          inputs:
+            sshEndpoint: 'javalogin'
+            sourceFolder: '$(System.DefaultWorkingDirectory)/target/'
+            contents: 'JavaLoginShowcase-1.0.0.war'
+            targetFolder: '/opt/tomcat/webapps/'
+            readyTimeout: '20000'
+        

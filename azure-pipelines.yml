@@ -23,5 +23,9 @@ stages:
             script: |
               cd $(System.DefaultWorkingDirectory)
               mvn clean package
-              sudo cp -r $(System.DefaultWorkingDirectory)/target/* /opt/tomcat/webapps
-              sudo systemctl restart tomcat
+              # sudo cp -r $(System.DefaultWorkingDirectory)/target/* /opt/tomcat/webapps
+              # sudo systemctl restart tomcat
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Pipeline.Workspace)'
+            publishLocation: 'pipeline'

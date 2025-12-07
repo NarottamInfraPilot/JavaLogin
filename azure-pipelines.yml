@@ -27,8 +27,8 @@ stages:
               # sudo systemctl restart tomcat
         - task: PublishPipelineArtifact@1
           inputs:
-            targetPath: '$(Pipeline.Workspace)'
-            artifact: 'javalogin'
+            targetPath: '$(System.DefaultWorkingDirectory)/target'
+            artifact: '$(artifactName)'
             publishLocation: 'pipeline'
 
   - stage: deployStage
@@ -49,10 +49,13 @@ stages:
             contents: '$(warFileName)'
             targetFolder: '$(deployFolder)'
             readyTimeout: '20000'
-        - task: Bash@3
+        - task: SSH@0
           inputs:
-            targetType: 'inline'
-            script: 'sudo systemctl restart tomcat'
+            sshEndpoint: 'javalogin'
+            runOptions: 'commands'
+            commands: 'sudo systemctl restart tomcat'
+            readyTimeout: '20000'
+
         
         
         

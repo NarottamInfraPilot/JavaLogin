@@ -48,13 +48,13 @@ stages:
             sshEndpoint: 'javalogin'
             sourceFolder: '$(Pipeline.Workspace)/drop'
             contents: '$(warFileName)'
-            targetFolder: '$(deployFolder)'
+            targetFolder: '/tmp/deploy'
             readyTimeout: '20000'
         - task: CopyFilesOverSSH@0
           inputs:
             sshEndpoint: 'javalogin'
-            sourceFolder: '$(deployFolder)'
-            contents: 'JavaLoginShowcase-1.0.0.war'
+            sourceFolder: '/tmp/deploy'
+            contents: '*.war'
             targetFolder: '/opt/tomcat/webapps'
             readyTimeout: '20000'
         - task: SSH@0

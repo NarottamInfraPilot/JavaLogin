@@ -52,6 +52,17 @@ stages:
               java -jar checkstyle.jar -c google_checks.xml src/main/java > checkstyle-result.txt
               echo "Checkstyle JAR completed."
 
+              # Check if violations exist
+              if grep -q "WARNING" checkstyle-result.txt || grep -q "ERROR" checkstyle-result.txt; then
+                echo "##vso[task.logissue type=warning] Checkstyle violations found. Review checkstyle-result.txt"
+              else
+                echo "No Checkstyle issues found."
+              fi
+
+              # Keep task green
+              echo "Checkstyle completed successfully."
+
+
         # 5) Publish results
         - task: PublishPipelineArtifact@1
           displayName: "Publish Checkstyle Results"

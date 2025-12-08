@@ -12,6 +12,55 @@ variables:
   # temp folder jaha WAR copy hoga
 
 stages:
+  - stage: linting
+    displayName: "Checkstyle Linting"
+    jobs:
+      - job: lintJob
+        displayName: "Run Checkstyle"
+        steps:
+
+        # 1) Download Checkstyle JAR
+        - task: Bash@3
+          displayName: "Download Checkstyle"
+          inputs:
+            targetType: 'inline'
+            script: |
+              wget https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.15.0/checkstyle-10.15.0-all.jar -O checkstyle.jar
+
+        # 2) Download Google Style Rules
+        - task: Bash@3
+          displayName: "Download google_checks.xml"
+          inputs:
+            targetType: 'inline'
+            script: |
+              wget https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml -O google_checks.xml
+
+        # 3) Maven Checkstyle
+        - task: Bash@3
+          displayName: "Run Maven Checkstyle"
+          inputs:
+            targetType: 'inline'
+            script: |
+              mvn checkstyle:checkstyle
+
+        # 4) Run Checkstyle JAR manually
+        - task: Bash@3
+          displayName: "Run Checkstyle JAR"
+          inputs:
+            targetType: 'inline'
+            script: |
+              java -jar checkstyle.jar -c google_checks.xml src/main/java > checkstyle-result.txt
+              echo "Checkstyle JAR completed."
+
+        # 5) Publish results
+        - task: PublishPipelineArtifact@1
+          displayName: "Publish Checkstyle Results"
+          inputs:
+            targetPath: '$(System.DefaultWorkingDirectory)'
+            artifact: 'checkstyle-results'
+            publishLocation: 'pipeline'
+
+
   - stage: 
     displayName: build wali stage
     jobs:
@@ -31,25 +80,6 @@ stages:
             targetPath: '$(System.DefaultWorkingDirectory)/target'
             artifact: '$(artifactName)'
             publishLocation: 'pipeline'
-  - stage: liniting
-    jobs:
-      - job: 
-        steps:
-        - task: Bash@3
-          displayName: wget https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.15.0/checkstyle-10.15.0-all.jar -O checkstyle.jart
-          inputs:
-            targetType: 'inline'
-            script: 'wget https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.15.0/checkstyle-10.15.0-all.jar -O checkstyle.jar'
-        - task: Bash@3
-          displayName: mvn checkstyle:checkstyle
-          inputs:
-            targetType: 'inline'
-            script: 'mvn checkstyle:checkstyle'
-        - task: Bash@3
-          displayName: java -jar checkstyle.jar -c /google_checks.xml src/main/java > checkstyle-result.txt
-          inputs:
-            targetType: 'inline'
-            script: 'java -jar checkstyle.jar -c /google_checks.xml src/main/java > checkstyle-result.txt'
 
   - stage: deployStage
     displayName: Deploy karna hai

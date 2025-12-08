@@ -47,23 +47,18 @@ stages:
           inputs:
             sshEndpoint: 'javalogin'
             sourceFolder: '$(Pipeline.Workspace)/drop'
-            contents: '$(warFileName)'
-            targetFolder: '/tmp/deploy'
-            readyTimeout: '20000'
-        - task: CopyFilesOverSSH@0
-          inputs:
-            sshEndpoint: 'javalogin'
-            sourceFolder: '/tmp/deploy'
             contents: '*.war'
-            targetFolder: '/opt/tomcat/webapps'
+            targetFolder: '/tmp/deploy'
             readyTimeout: '20000'
         - task: SSH@0
           inputs:
             sshEndpoint: 'javalogin'
             runOptions: 'commands'
-            commands: 'sudo systemctl restart tomcat'
+            commands: |
+              sudo rm -rf /opt/tomcat/webapps/JavaLoginShowcase*
+              sudo cp /tmp/deploy/*.war /opt/tomcat/webapps/
+              sudo systemctl restart tomcat
             readyTimeout: '20000'
-        
 
         
         

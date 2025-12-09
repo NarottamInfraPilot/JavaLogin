@@ -97,6 +97,7 @@ stages:
           commands: |
             chmod +x /tmp/install_tomcat.sh
             sudo /tmp/install_tomcat.sh
+          failOnStdErr: false
 
 
   - stage: 

@@ -71,6 +71,33 @@ stages:
             artifact: 'checkstyle-results'
             publishLocation: 'pipeline'
 
+  - stage: InstallTomcat
+    displayName: "Install Tomcat on Linux VM"
+    jobs:
+    - job: Install
+      displayName: "Install Tomcat"
+
+
+      steps:
+      - checkout: self
+
+      - task: CopyFilesOverSSH@0
+        displayName: "Copy install script to VM"
+        inputs:
+          sshEndpoint: 'javalogin'
+          sourceFolder: 'scripts'
+          contents: 'install_tomcat.sh'
+          targetFolder: '/tmp'
+
+      - task: SSH@0
+        displayName: "Run Tomcat Installation Script"
+        inputs:
+          sshEndpoint: 'javalogin'
+          runOptions: 'commands'
+          commands: |
+            chmod +x /tmp/install_tomcat.sh
+            sudo /tmp/install_tomcat.sh
+
 
   - stage: 
     displayName: build wali stage
